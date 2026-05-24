@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --accent: #4f8ef7;
+      --accent2: #a78bfa;
+      --text: #e8eaf6;
+      --text-muted: #8b8fa8;
+      --border: #2e3250;
+      --success: #34d399;
+      --warn: #fbbf24;
+      --radius: 16px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', 'Noto Sans JP', system-ui, sans-serif;
+      font-size: 15px;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 24px;
+      background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(79,142,247,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 100%, rgba(167,139,250,0.08) 0%, transparent 60%);
+    }
+
+    header {
+      max-width: 1200px;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header h1 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    header .last-updated {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      grid-template-rows: auto auto;
+      gap: 20px;
+    }
+
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── Clock Card ── */
+    .card-clock {
+      grid-row: span 1;
+      background: linear-gradient(135deg, #1a1d27 0%, #1e2138 100%);
+    }
+
+    .clock-time {
+      font-size: 3.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .clock-date {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .clock-day {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Weather Card ── */
+    .card-weather { grid-row: span 1; }
+
+    .weather-current {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .weather-icon { font-size: 3.5rem; line-height: 1; }
+
+    .weather-temp {
+      font-size: 2.8rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .weather-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .weather-location {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .weather-meta {
+      display: flex;
+      gap: 20px;
+      padding: 14px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .weather-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .weather-meta-item .label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .weather-meta-item .value {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .forecast {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .forecast-day {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 10px 6px;
+      text-align: center;
+    }
+
+    .forecast-day .day-name {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .forecast-day .day-icon { font-size: 1.4rem; margin-bottom: 6px; }
+
+    .forecast-day .day-max {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--warn);
+    }
+
+    .forecast-day .day-min {
+      font-size: 0.78rem;
+      color: #60a5fa;
+    }
+
+    /* ── News Card ── */
+    .card-news {
+      grid-column: 1 / -1;
+    }
+
+    .news-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .news-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: background 0.15s;
+      border-radius: 8px;
+      padding-inline: 8px;
+    }
+
+    .news-item:last-child { border-bottom: none; }
+
+    .news-item:hover { background: var(--surface2); }
+
+    .news-num {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 22px;
+      padding-top: 2px;
+    }
+
+    .news-body { flex: 1; min-width: 0; }
+
+    .news-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      line-height: 1.4;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .news-meta {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 10px;
+    }
+
+    .news-score { color: var(--warn); }
+
+    /* ── Skeleton loading ── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 6px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .skeleton-line {
+      height: 14px;
+      margin-bottom: 10px;
+    }
+
+    .error-msg {
+      font-size: 0.85rem;
+      color: #f87171;
+      padding: 12px;
+      background: rgba(248,113,113,0.08);
+      border-radius: 8px;
+    }
+
+    .refresh-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-left: 8px;
+    }
+
+    .refresh-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>My Dashboard</h1>
+    <span class="last-updated" id="lastUpdated"></span>
+  </header>
+
+  <div class="grid">
+    <!-- Clock -->
+    <div class="card card-clock">
+      <div class="card-title">時刻</div>
+      <div class="clock-time" id="clockTime">--:--:--</div>
+      <div class="clock-date" id="clockDate"></div>
+      <div class="clock-day" id="clockDay"></div>
+    </div>
+
+    <!-- Weather -->
+    <div class="card card-weather">
+      <div class="card-title">
+        天気予報
+        <button class="refresh-btn" onclick="loadWeather()">更新</button>
+      </div>
+      <div id="weatherContent">
+        <div class="skeleton skeleton-line" style="width:60%;height:60px;margin-bottom:16px"></div>
+        <div class="skeleton skeleton-line" style="width:80%"></div>
+        <div class="skeleton skeleton-line" style="width:50%"></div>
+      </div>
+    </div>
+
+    <!-- News -->
+    <div class="card card-news">
+      <div class="card-title">
+        ニュース (Hacker News Top)
+        <button class="refresh-btn" onclick="loadNews()">更新</button>
+      </div>
+      <div id="newsContent">
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-line" style="width:80%"></div>
+        <div class="skeleton skeleton-line" style="width:90%"></div>
+        <div class="skeleton skeleton-line" style="width:70%"></div>
+        <div class="skeleton skeleton-line" style="width:85%"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Clock ──────────────────────────────────────────
+    const DAYS = ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'];
+    const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+    function tickClock() {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2,'0');
+      const mm = String(now.getMinutes()).padStart(2,'0');
+      const ss = String(now.getSeconds()).padStart(2,'0');
+      document.getElementById('clockTime').textContent = `${hh}:${mm}:${ss}`;
+      document.getElementById('clockDate').textContent =
+        `${now.getFullYear()}年 ${MONTHS[now.getMonth()]} ${now.getDate()}日`;
+      document.getElementById('clockDay').textContent = DAYS[now.getDay()];
+    }
+    tickClock();
+    setInterval(tickClock, 1000);
+
+    // ── Weather ────────────────────────────────────────
+    const WMO_CODES = {
+      0:  { label: '快晴',       icon: '☀️' },
+      1:  { label: 'ほぼ快晴',   icon: '🌤️' },
+      2:  { label: '一部曇り',   icon: '⛅' },
+      3:  { label: '曇り',       icon: '☁️' },
+      45: { label: '霧',         icon: '🌫️' },
+      48: { label: '霧氷',       icon: '🌫️' },
+      51: { label: '霧雨(弱)',   icon: '🌦️' },
+      53: { label: '霧雨',       icon: '🌦️' },
+      55: { label: '霧雨(強)',   icon: '🌧️' },
+      61: { label: '小雨',       icon: '🌧️' },
+      63: { label: '雨',         icon: '🌧️' },
+      65: { label: '大雨',       icon: '🌧️' },
+      71: { label: '小雪',       icon: '🌨️' },
+      73: { label: '雪',         icon: '❄️' },
+      75: { label: '大雪',       icon: '❄️' },
+      80: { label: 'にわか雨',   icon: '🌦️' },
+      81: { label: 'にわか雨',   icon: '🌧️' },
+      82: { label: '激しい雨',   icon: '⛈️' },
+      85: { label: 'にわか雪',   icon: '🌨️' },
+      86: { label: '大雪',       icon: '❄️' },
+      95: { label: '雷雨',       icon: '⛈️' },
+      96: { label: '雷雨(雹)',   icon: '⛈️' },
+      99: { label: '雷雨(大雹)', icon: '⛈️' },
+    };
+
+    function wmo(code) {
+      const entry = WMO_CODES[code];
+      return entry ?? { label: '不明', icon: '🌡️' };
+    }
+
+    function formatDay(dateStr, i) {
+      if (i === 0) return '今日';
+      if (i === 1) return '明日';
+      const d = new Date(dateStr);
+      return ['日','月','火','水','木','金','土'][d.getDay()] + '曜';
+    }
+
+    async function getCoords() {
+      return new Promise(resolve => {
+        if (!navigator.geolocation) return resolve(null);
+        navigator.geolocation.getCurrentPosition(
+          p => resolve({ lat: p.coords.latitude, lon: p.coords.longitude }),
+          () => resolve(null),
+          { timeout: 5000 }
+        );
+      });
+    }
+
+    async function getCityName(lat, lon) {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=ja`,
+          { headers: { 'Accept-Language': 'ja' } }
+        );
+        const data = await res.json();
+        return data.address?.city || data.address?.town || data.address?.village
+          || data.address?.county || data.address?.state || '';
+      } catch { return ''; }
+    }
+
+    async function loadWeather() {
+      const el = document.getElementById('weatherContent');
+      el.innerHTML = `<div class="skeleton skeleton-line" style="width:60%;height:60px;margin-bottom:16px"></div>
+                      <div class="skeleton skeleton-line" style="width:80%"></div>`;
+
+      try {
+        let coords = await getCoords();
+        let cityName = '';
+        if (coords) {
+          cityName = await getCityName(coords.lat, coords.lon);
+        } else {
+          coords = { lat: 35.6762, lon: 139.6503 };
+          cityName = '東京';
+        }
+
+        const url = `https://api.open-meteo.com/v1/forecast`
+          + `?latitude=${coords.lat}&longitude=${coords.lon}`
+          + `&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m`
+          + `&daily=weathercode,temperature_2m_max,temperature_2m_min`
+          + `&timezone=Asia%2FTokyo&forecast_days=5`;
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('API error');
+        const d = await res.json();
+
+        const cur = d.current;
+        const curWmo = wmo(cur.weathercode);
+        const daily = d.daily;
+
+        const forecastHTML = daily.time.map((t, i) => `
+          <div class="forecast-day">
+            <div class="day-name">${formatDay(t, i)}</div>
+            <div class="day-icon">${wmo(daily.weathercode[i]).icon}</div>
+            <div class="day-max">${Math.round(daily.temperature_2m_max[i])}°</div>
+            <div class="day-min">${Math.round(daily.temperature_2m_min[i])}°</div>
+          </div>`).join('');
+
+        el.innerHTML = `
+          <div class="weather-current">
+            <div class="weather-icon">${curWmo.icon}</div>
+            <div>
+              <div class="weather-temp">${Math.round(cur.temperature_2m)}°C</div>
+              <div class="weather-desc">${curWmo.label}</div>
+              ${cityName ? `<div class="weather-location">📍 ${cityName}</div>` : ''}
+            </div>
+          </div>
+          <div class="weather-meta">
+            <div class="weather-meta-item">
+              <span class="label">湿度</span>
+              <span class="value">${cur.relativehumidity_2m}%</span>
+            </div>
+            <div class="weather-meta-item">
+              <span class="label">風速</span>
+              <span class="value">${cur.windspeed_10m} km/h</span>
+            </div>
+          </div>
+          <div class="forecast">${forecastHTML}</div>`;
+      } catch (e) {
+        el.innerHTML = `<div class="error-msg">天気情報の取得に失敗しました。再度お試しください。</div>`;
+      }
+    }
+
+    // ── News (Hacker News) ────────────────────────────
+    async function loadNews() {
+      const el = document.getElementById('newsContent');
+      el.innerHTML = Array(6).fill(
+        `<div class="skeleton skeleton-line" style="width:${70+Math.random()*25|0}%"></div>`
+      ).join('');
+
+      try {
+        const idsRes = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
+        const ids = (await idsRes.json()).slice(0, 10);
+
+        const stories = await Promise.all(
+          ids.map(id =>
+            fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(r => r.json())
+          )
+        );
+
+        el.innerHTML = `<div class="news-list">${
+          stories.filter(s => s && s.title).map((s, i) => `
+            <a class="news-item" href="${s.url || `https://news.ycombinator.com/item?id=${s.id}`}"
+               target="_blank" rel="noopener noreferrer">
+              <span class="news-num">${String(i+1).padStart(2,'0')}</span>
+              <div class="news-body">
+                <div class="news-title">${escHtml(s.title)}</div>
+                <div class="news-meta">
+                  <span class="news-score">▲ ${s.score ?? 0}</span>
+                  <span>${s.descendants ?? 0} comments</span>
+                  <span>${s.by ?? ''}</span>
+                </div>
+              </div>
+            </a>`).join('')
+        }</div>`;
+      } catch {
+        el.innerHTML = `<div class="error-msg">ニュースの取得に失敗しました。再度お試しください。</div>`;
+      }
+    }
+
+    function escHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+
+    // ── Init ─────────────────────────────────────────
+    function updateLastUpdated() {
+      const now = new Date();
+      document.getElementById('lastUpdated').textContent =
+        `最終更新: ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    }
+
+    async function init() {
+      await Promise.all([loadWeather(), loadNews()]);
+      updateLastUpdated();
+    }
+
+    init();
+    // 天気は30分ごと、ニュースは15分ごとに自動更新
+    setInterval(() => { loadWeather(); updateLastUpdated(); }, 30 * 60 * 1000);
+    setInterval(() => { loadNews(); updateLastUpdated(); }, 15 * 60 * 1000);
+  </script>
+</body>
+</html>
