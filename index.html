@@ -404,19 +404,7 @@
   <script src="https://accounts.google.com/gsi/client" async onload="initCalendarAuth()"></script>
 
   <script>
-    // ════════════════════════════════════════════════════════════
-    //  ★ ここに Google Cloud Console で取得した Client ID を貼り付け
-    //    手順: https://console.cloud.google.com/
-    //      1. 新しいプロジェクト作成
-    //      2. 「APIとサービス」→「ライブラリ」→ Google Calendar API を有効化
-    //      3. 「認証情報」→「認証情報を作成」→「OAuthクライアントID」
-    //      4. アプリの種類:「ウェブアプリケーション」
-    //      5. 承認済みのJavaScript生成元に以下を追加:
-    //           https://climbone.github.io
-    //           http://localhost (ローカルテスト用)
-    //      6. 生成された「クライアントID」を下に貼り付け
-    // ════════════════════════════════════════════════════════════
-    const GOOGLE_CLIENT_ID = '';  // ← ここに貼り付け例: '123456789-abc.apps.googleusercontent.com'
+    const GOOGLE_CLIENT_ID = '229119775387-0aghogecvbeku4ffulcgaqlv7vsnroj7.apps.googleusercontent.com';
 
     const DAYS   = ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'];
     const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
